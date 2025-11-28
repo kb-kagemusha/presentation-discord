@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>応募フォーム | プレゼン用アクセスサイト</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6348 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            padding: 45px 35px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6348 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+            color: #333;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ff6348;
+            box-shadow: 0 0 0 3px rgba(255, 99, 72, 0.1);
+        }
+
+        input::placeholder {
+            color: #aaa;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6348 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 99, 72, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* ポップアップ */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .popup {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: popupBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popupBounce {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .popup h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .popup p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .popup-btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6348 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 99, 72, 0.3);
+        }
+
+        /* 応募済み表示 */
+        .submitted-message {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .submitted-message.show {
+            display: block;
+        }
+
+        .submitted-message h2 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6348 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .submitted-message p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .form-container.hide {
+            display: none;
+        }
+
+        /* スマホ最適化 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 35px 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .popup {
+                padding: 30px 20px;
+            }
+
+            .popup h2 {
+                font-size: 20px;
+            }
+
+            .submitted-message h2 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ご応募ありがとうございます</h1>
+            <p>下記に必要事項を記入の上、<br>「送信」ボタンを押してください</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="form-container" id="formContainer">
+            <form id="applicationForm">
+                <div class="form-group">
+                    <label for="name">お名前</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="例: 山田 太郎"
+                        required
+                        autocomplete="name"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="age">年齢</label>
+                    <input
+                        type="number"
+                        id="age"
+                        name="age"
+                        placeholder="例: 25"
+                        min="0"
+                        max="150"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="discordId">Discord上での名前またはDiscordのID</label>
+                    <input
+                        type="text"
+                        id="discordId"
+                        name="discordId"
+                        placeholder="例: username#1234 または 123456789012345678"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    送信
+                </button>
+            </form>
+        </div>
+
+        <div class="submitted-message" id="submittedMessage">
+            <h2>応募済み</h2>
+            <p>ご応募ありがとうございました。<br>受付が完了しております。</p>
+        </div>
+
+        <div class="footer">
+            プレゼン用アクセスサイト
+        </div>
+    </div>
+
+    <!-- ポップアップ -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup">
+            <h2>ありがとうございます</h2>
+            <p>受け付けました</p>
+            <button class="popup-btn" onclick="closePopup()">閉じる</button>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('applicationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+        const formContainer = document.getElementById('formContainer');
+        const submittedMessage = document.getElementById('submittedMessage');
+        const popupOverlay = document.getElementById('popupOverlay');
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        function showPopup() {
+            popupOverlay.classList.add('show');
+        }
+
+        function closePopup() {
+            popupOverlay.classList.remove('show');
+            // ポップアップを閉じたら、フォームを非表示にして応募済みを表示
+            formContainer.classList.add('hide');
+            submittedMessage.classList.add('show');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                discordId: document.getElementById('discordId').value
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span>';
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // ポップアップを表示
+                    showPopup();
+                } else {
+                    showMessage(result.message || 'エラーが発生しました', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '送信';
+                }
+            } catch (error) {
+                console.error('送信エラー:', error);
+                showMessage('送信に失敗しました。もう一度お試しください。', 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '送信';
+            }
+        });
+
+        // 年齢のバリデーション
+        document.getElementById('age').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (value < 0) e.target.value = 0;
+            if (value > 150) e.target.value = 150;
+        });
+    </script>
+</body>
+</html>
